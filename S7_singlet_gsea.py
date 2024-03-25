@@ -17,7 +17,7 @@ matplotlib.use('cairo')
 
 def parallel_gsea(kwargs: dict) -> None:
     import gseapy as gp
-    from src.globals import gene_sets
+    from globals import gene_sets
     
     seed = 2015854237
     d = kwargs['dataset']
@@ -200,9 +200,9 @@ def start(n_proc=None) -> None:
     import mygene
     import time
     import datetime
-    import src.globals
-    from src.globals import checkpoint_dir, annotation_dir, marker_genes_dir, gsea_dir
-    from src.globals import data, datasets_divided, lineage_resolution_final, n_neighbors_final, n_hvg_spi
+    import globals
+    from globals import checkpoint_dir, annotation_dir, marker_genes_dir, gsea_dir
+    from globals import data, datasets_divided, lineage_resolution_final, n_neighbors_final, n_hvg_spi
     
     neigh = n_neighbors_final[0]
     # Load socres

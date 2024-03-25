@@ -34,7 +34,7 @@ def sample_factions(adata: sc.AnnData,
     condition: `str`
         String to choose from injury_day or injury_condition list of samples
     """
-    from src.globals import injury_condition, injury_day, injury_region, collection_region, \
+    from globals import injury_condition, injury_day, injury_region, collection_region, \
         injury_region_no_central, collection_region_no_central
 
     samples = [] ##creates an empty list samples to store the selected samples
@@ -138,7 +138,7 @@ def sample_counts(adata: sc.AnnData,##calc & return DF(table_counts) representin
     condition: `str`
         String to choose from injury_day or injury_condition list of samples
     """
-    from src.globals import injury_condition, injury_day, injury_region, collection_region, \
+    from globals import injury_condition, injury_day, injury_region, collection_region, \
         injury_region_no_central, collection_region_no_central##imports vars from src.globals
 
     samples = []
@@ -228,8 +228,8 @@ def plot_stacked_plots(data: pd.DataFrame,
                        dataset_name: str,
                        alternate_sample_names=None
                        ) -> None:
-    from src.globals import fractions_dir
-    from src.globals import proportion_colors
+    from globals import fractions_dir
+    from globals import proportion_colors
     
     clusters = [i for i in range(len(data.index))]##list created, containing int from 0 to len of index DF This list is used as x-axis ticks in the subsequent plot
     colors = [proportion_colors[c] for c in data.columns]##list created by mapping the colors from the proportion_colors dictionary to the column names of the input DataFrame data
@@ -288,9 +288,9 @@ def fishertest_mp(kwargs: dict):
 ##The start function is the main function that initiates the processing of data and statistical tests. It loads necessary modules and data from the src.globals module. The function takes an optional argument n_proc, which determines the number of processes for multiprocessing
 
 def start(n_proc=None) -> None:
-    import src.globals
-    from src.globals import checkpoint_dir, fractions_dir
-    from src.globals import data, datasets_divided, lineage_resolution_final, n_neighbors_final
+    import globals
+    from globals import checkpoint_dir, fractions_dir
+    from globals import data, datasets_divided, lineage_resolution_final, n_neighbors_final
     
     # Load ranked data
     #for d in list(datasets_divided.keys()):

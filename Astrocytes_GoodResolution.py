@@ -19,9 +19,11 @@ import matplotlib.pyplot as plt
 Astrocytes_imune_Cells = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
 
 def start() -> None:
-    import src.globals
-    from src.globals import data, data2
+    import globals
+    from globals import data, data2
   
+  
+    # Why only Astrocytes?? Do for all
     for d in ['Astrocyte']:    ##The code iterates over datasets stored in the datasets_divided list
         # Load batch correct data 
         dest = f"{Astrocytes_imune_Cells}/adata_final_{d}_cca_features.h5ad"
