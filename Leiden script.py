@@ -16,8 +16,8 @@ def start():
     
     for d in ['Astrocyte', 'Immune']:   # The code iterates over datasets stored in the datasets_divided list
         # Load batch correct data 
-        dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad" 
-        if os.path.exists(dest):    # checks if the batch-corrected data already exists 
+        dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
+        if os.path.exists(dest):    # checks if the batch-corrected data already exists
             print("Load batch corrected data...")
             print(dest)
             adata = sc.read_h5ad(dest)    # If the file exists, it is loaded using sc.read_h5ad

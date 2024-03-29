@@ -42,7 +42,7 @@ fi
 # TODO
 # TODO: Harmonize file name
 FILE="S2.3_singlet_clustree_analysis.r"
-Rscript $FILE
+Rscript "$FILE"
 if [[ $? -eq 0 ]]
 then
   echo "Success '$FILE'"
