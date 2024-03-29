@@ -11,9 +11,9 @@ import scanpy as sc
 Astrocytes_imune_Cells = "/mnt/c/Users/vasco/OneDrive/Área de Trabalho/Bioinformatica_IMM/2023-07-16_1809/Astrocytes_imune_Cells"
 
 def start(n_proc=None) -> None:
-    import src.globals
-    from src.globals import n_neighbors_final, lineage_resolution_tests 
-    from src.globals import data, datasets_divided
+    import globals
+    from globals import n_neighbors_final, lineage_resolution_tests 
+    from globals import data, datasets_divided
     
 
     for d in ['Astrocyte', 'Immune']:  ##The code iterates over datasets stored in the datasets_divided list

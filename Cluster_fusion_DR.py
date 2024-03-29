@@ -32,61 +32,49 @@ dict_bad_cells = {
 ### Load data
 # Use adata_cca_features.h5ad --> must contain info about r1 and r2
 
-Astrocytes_imune_Cells = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
-
-
-
+# New code to refactor
+small_names = {
+    'Astrocyte': 'Ast',
+    'Immune': 'Imm',
+}
 
 
 def start() -> None:
-    import src.globals
-    from src.globals import data2
+    # Import working directories
+    from globals import H5AD_DIR, CLUSTER_FUSION_DIR
+    from globals import DATASETS
     
-    for d in ['Immune']:    ##The code iterates over datasets stored in the datasets_divided list
+    for d in DATASETS:   
+        #The code iterates over datasets stored in the datasets_divided list
         # Load cluster fusion file. The first columns contain higher resolution culsters
         # The fusion will be done from bottom to top of the cluster tree.
         # Thus, if a cell is to belong to a cluster from a high res, it will not be part of a cluster form a lower res.
-        print("Load cluster fusion file...")
-        cluster_df = pd.read_csv(f"/mnt/c/Users/vasco/Env/cluster_fusion/{d}_fusion.tsv",
-                             sep='\t',
-                             header=0,
-                             dtype='category',
-                             index_col=None,
-                             na_filter=False)
-        #cluster_df.fillna('', inplace=True)
-        print(cluster_df)
+        dest = f"{CLUSTER_FUSION_DIR}/{d}_fusion.tsv"
+        if os.path.exists(dest):
+            print("Load cluster fusion file...")
+            print(dest)
+            cluster_df = pd.read_csv(dest,
+                                     sep='\t',
+                                     header=0,
+                                     dtype='category',
+                                     index_col=None,
+                                     na_filter=False)
+            print(cluster_df)
+        else:
+            continue
         
-        # Load batch correct data 
-        dest = f"{Astrocytes_imune_Cells}/adata_final_{d}_cca_features.h5ad"
-        if os.path.exists(dest):  ##checks if the batch-corrected data already exists
+        # Load batch correct data
+        dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
+        if os.path.exists(dest):    # checks if the batch-corrected data already exists
             print("Load batch corrected data...")
             print(dest)
             adata = sc.read_h5ad(dest)
-                       
         else:
             continue
-        #
-        #mask_r1 = adata.obs["test_leiden_n15_r1.00"].isin(cluster_df['r1'])     
-        #mask_r2 = adata.obs["test_leiden_n15_r2.00"].isin(Good_clusters_r2)
-        #
-        #Goodcells = adata[mask_r1 & mask_r2].copy()
-        #Badcells = adata[~(mask_r1 & mask_r2)].copy()
-#
-        #cell_names_good = Goodcells.obs_names.to_list()
-        #cell_names_bad = Badcells.obs_names.to_list()
-        #
-        #adata.obs['Fusion_cluster'] = None
-     #
-        #adata.obs.loc[cell_names_good, 'Fusion_cluster'] = Goodcells.obs.loc[cell_names_good, "test_leiden_n15_r2.00"]
-        #
-        #adata.obs.loc[cell_names_bad, 'Fusion_cluster'] = Badcells.obs.loc[cell_names_bad, "test_leiden_n15_r1.00"] #Rever função loc.
-#
+
 
         #TODO
-        # New code to refactor
-        small_names = {'Astrocyte': 'Ast',
-                       'Immune': 'Imm'
-                       }
+        
         clustered_cells = []                 # Save cells that were already annotated in a higher resolution
         print(adata)
         for res in cluster_df.columns:
@@ -123,8 +111,7 @@ def start() -> None:
                 adata.obs.loc[mask, 'leiden_fusion'] = f"{small_names[d]}.NA"
         # Reset clusters
         adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].astype(dtype='category')
-        adata.obs['leiden_fusion'].cat.remove_unused_categories()
-
+        adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].cat.remove_unused_categories()
 
         
         ## Convert cluster names

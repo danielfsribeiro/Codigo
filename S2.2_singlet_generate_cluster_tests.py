@@ -10,9 +10,9 @@ import scanpy as sc
 
 
 def start(n_proc=None) -> None:
-    import src.globals
-    from src.globals import checkpoint_dir, n_neighbors_final, lineage_resolution_tests 
-    from src.globals import data, datasets_divided
+    import globals
+    from globals import checkpoint_dir, n_neighbors_final, lineage_resolution_tests 
+    from globals import data, datasets_divided
     from multiprocessing.pool import Pool
 
     for d in datasets_divided:  ##The code iterates over datasets stored in the datasets_divided list
