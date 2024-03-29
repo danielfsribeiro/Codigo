@@ -1,7 +1,7 @@
 # Study clustering across resolutions clustree - LeonorSaude10x
 #
 # Decide for a good cutoff on resolution
-# Requires conversion from .h5ad to .rds from S2.2 
+# Requires conversion from .h5ad to .rds 
 #
 # Daniel Ribeiro, 2023
 library("Seurat")
@@ -17,14 +17,13 @@ options(Ncpus = parallel::detectCores())##sets nº of CPUs 4 parallel processing
 # Dataset suffix
 f_suffix = 'automax'
 cell_suffix = '0k'
-##f_suffix and cell_suffix are used to form parts of the output directory path
 
 # Directories
-input_dir = "output/0_checkpoint/" ##specifies the directory where input data files are located
-output_dir = paste0("output/", cell_suffix, "_", f_suffix, "/10_cluster_trees")##specifies directory where output files will be saved
+input_dir = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells" ##specifies the directory where input data files are located
+output_dir = paste0(input_dir, "/Clustresults") ##specifies directory where output files will be saved
 
 # Dataset to analyze
-datasets_divided = c('Immune', 'Meningeal_Vascular', 'Astrocyte', 'Oligodendrocyte', 'Neuron')
+datasets_divided = c('Immune', 'Astrocyte')
 
 # Run clustree
 print("Run clustree ...")
@@ -33,15 +32,12 @@ node_colour = NULL
 core_edges = FALSE
 layout = "tree"
 fig_size = list()   # w x h
-fig_size[['Immune']] = c(7, 5)
-fig_size[['Meningeal_Vascular']] = c(30, 15)
-fig_size[['Astrocyte']] = c(7, 5)
-fig_size[['Oligodendrocyte']] = c(30, 15)
-fig_size[['Neuron']] = c(60, 20)
+fig_size[['Immune']] = c(15, 10)
+fig_size[['Astrocyte']] = c(15, 10)
 
 for (d in datasets_divided) ##loop to run clustree for each dataset specified in datasets_divided
 {
-  filename_in = paste0(input_dir, "adata_final_", d, "_cca_features.rds")
+  filename_in = paste0(input_dir, "/adata_final_", d, "_cca_features.rds")
   print(filename_in) ##for each dataset, constructs input file path
   adata.seurat = readRDS(filename_in) ##reads the input data and stores it in the variable adata.seurat
   if (!is.null(node_colour))##runs clustree with different options based on node_colour variable

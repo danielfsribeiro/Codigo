@@ -1,58 +1,71 @@
 #!/bin/bash
 conda activate py39
 
-# Exececute a file at a time
-# TODO: What does "Leiden script.py" do? Maybe give it a more meaningful name
-# Creates cluslters at multiple resolutions
-FILE="Leiden script.py"
-python "$FILE"
-if [[ $? -eq 0 ]]
-then
-  echo "Success '$FILE'"
-  echo "Script ran successfuly."
-else
-  echo "Error '$FILE'"
-  echo "Script did not complete. Exit all analysis."
-  return 1
-fi
+H5AD_DIR="/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
 
-# TODO
-# Vizualize clusters. Didn't find code for Immune cells
-# TODO: Harmonize name and make it general for all populations
-FILE="Astrocytes_GoodResolution.py"
-python "$FILE"
-if [[ $? -eq 0 ]]
-then
-  echo "Success '$FILE'"
-  echo "Script ran successfuly."
-else
-  echo "Error '$FILE'"
-  echo "Script did not complete. Exit all analysis."
-  return 1
-fi
+## Exececute a file at a time
+## Creates cluslters at multiple resolutions
+#FILE="Leiden script.py"
+#python "$FILE"
+#if [[ $? -eq 0 ]]
+#then
+#  echo "Success '$FILE'"
+#  echo "Script ran successfuly."
+#  echo " "
+#else
+#  echo "Error '$FILE'"
+#  echo "Script did not complete. Exit all analysis."
+#  echo " "
+#  return 1
+#fi
 
+## Plot UMAPs
+#FILE="Astrocytes_GoodResolution.py"
+#python "$FILE"
+#if [[ $? -eq 0 ]]
+#then
+#  echo "Success '$FILE'"
+#  echo "Script ran successfuly."
+#  echo " "
+#else
+#  echo "Error '$FILE'"
+#  echo "Script did not complete. Exit all analysis."
+#  echo " "
+#  return 1
+#fi
+#
+#FILE="Immune_GoodResolution.py"
+#python "$FILE"
+#if [[ $? -eq 0 ]]
+#then
+#  echo "Success '$FILE'"
+#  echo "Script ran successfuly."
+#  echo " "
+#else
+#  echo "Error '$FILE'"
+#  echo "Script did not complete. Exit all analysis."
+#  echo " "
+#  return 1
+#fi
 
-# TODO
-# Convert .h5ad into rds
-# Substitute the file paths
-. h5ad_to_rds.sh analysis/output/0_checkpoint/adata_final_Neuron_cca_features.h5ad analysis/output/0_checkpoint/adata_final_Neuron_cca_features.rds
-
-
-
-# TODO
-# TODO: Harmonize file name
-FILE="S2.3_singlet_clustree_analysis.r"
-Rscript "$FILE"
-if [[ $? -eq 0 ]]
-then
-  echo "Success '$FILE'"
-  echo "Script ran successfuly."
-  rm -v ./output/0_checkpoint/adata_final_Neuron_cca_features.rds
-else
-  echo "Error '$FILE'"
-  echo "Script did not complete. Exit all analysis."
-  return 1
-fi
+## Convert .h5ad into rds
+#. h5ad_to_rds.sh ${H5AD_DIR}/adata_final_Astrocyte_cca_features.h5ad ${H5AD_DIR}/adata_final_Astrocyte_cca_features.rds
+#. h5ad_to_rds.sh ${H5AD_DIR}/adata_final_Immune_cca_features.h5ad ${H5AD_DIR}/adata_final_Immune_cca_features.rds
+#FILE="Clustree_analysis.r"
+#Rscript "$FILE"
+#if [[ $? -eq 0 ]]
+#then
+#  echo "Success '$FILE'"
+#  echo "Script ran successfuly."
+#  echo " "
+#  rm -v ${H5AD_DIR}/adata_final_Astrocyte_cca_features.rds
+#  rm -v ${H5AD_DIR}/adata_final_Immune_cca_features.rds
+#else
+#  echo "Error '$FILE'"
+#  echo "Script did not complete. Exit all analysis."
+#  echo " "
+#  return 1
+#fi
 
 
 # TODO
@@ -64,9 +77,11 @@ if [[ $? -eq 0 ]]
 then
   echo "Success '$FILE'"
   echo "Script ran successfuly."
+  echo " "
 else
   echo "Error '$FILE'"
   echo "Script did not complete. Exit all analysis."
+  echo " "
   return 1
 fi
 

@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 def start() -> None:
     from globals import H5AD_DIR, Clustresults
     
-    d = 'Astrocyte'
+    d = 'Immune'
     # Load batch correct data 
     dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
     if os.path.exists(dest):  ##checks if the batch-corrected data already exists
@@ -19,7 +19,7 @@ def start() -> None:
     else:
         return 
     
-    resolutions = ['test_leiden_n15_r0.6', 'test_leiden_n15_r2.0', 'test_leiden_n15_r1.0']
+    resolutions = ['test_leiden_n15_r1.0', 'test_leiden_n15_r2.0']
     
     # UMAP 
     for r in resolutions:

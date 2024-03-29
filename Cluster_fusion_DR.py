@@ -45,7 +45,7 @@ def start() -> None:
     from globals import DATASETS
     
     for d in DATASETS:   
-        #The code iterates over datasets stored in the datasets_divided list
+        # The code iterates over datasets stored in the datasets_divided list
         # Load cluster fusion file. The first columns contain higher resolution culsters
         # The fusion will be done from bottom to top of the cluster tree.
         # Thus, if a cell is to belong to a cluster from a high res, it will not be part of a cluster form a lower res.
@@ -78,7 +78,7 @@ def start() -> None:
         clustered_cells = []                 # Save cells that were already annotated in a higher resolution
         print(adata)
         for res in cluster_df.columns:
-            key = f'test_leiden_n15_{res}.00'      # recupera a resolução que precisamos olhar
+            key = f'test_leiden_n15_{res}'      # recupera a resolução que precisamos olhar
             categories = [str(s) for s in cluster_df.loc[:, res].cat.categories.to_list()]
             print(f"Clusters to include res={key}: {' '.join(categories)}")     #Debug
             # Which cells belonging to selected clusters
@@ -104,6 +104,7 @@ def start() -> None:
         # Check if any new cluster has less than 10 cells. If so, label them as 'NA'
         clusters = adata.obs['leiden_fusion'].cat.categories.to_list()
         clusters.sort()
+        print(clusters)
         for c in clusters:
             mask = adata.obs['leiden_fusion'] == c
             if mask.sum() < 10:
@@ -112,70 +113,8 @@ def start() -> None:
         # Reset clusters
         adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].astype(dtype='category')
         adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].cat.remove_unused_categories()
-
-        
-        ## Convert cluster names
-
-        #Células pertencentes aos clusters com resolução final aceitável de 2.00 (Goodcells)
-        #for key, value in dict_good_cells.items():
-        #    mask_3 = adata.obs['leiden_fusion'].isin([key])
-        #    adata.obs.loc[mask_3, 'leiden_fusion'] = value
-
-        #Células pertencentes aos clusters com resolução final aceitável de 1.00 (Badcells)
-        #for key, value in dict_bad_cells.items():
-        #    mask_4 = adata.obs['leiden_fusion'].isin([key])
-        #    adata.obs.loc[mask_4, 'leiden_fusion'] = value
-        
-        #columns_to_keep = ["Fusion_cluster"] #apagar obs: "leiden_n15", "test_leiden_n15"
-        #adata.obs = adata.obs[columns_to_keep]
-        #adata.uns.clear()
-        
-        #print("Goodcells:")
-        #print(Goodcells.obs["test_leiden_n15_r2.00"].to_list())
-        #print("Badcells:")
-        #print(Goodcells.obs["test_leiden_n15_r1.00"].to_list())
-        #print("adata")
-        #print(adata.obs["Fusion_cluster"].to_list())
-        #print(adata.obs)
-        #print(adata.uns)
         
         # UMAP 
-        #fig = plt.figure(figsize=(7, 7), dpi=300)
-        fig, ax = plt.subplots(figsize=(7, 7))
-        
-        adata.obsm["X_umap"] = adata.obsm["X_umap_neighbors_n15"]
-        sc.pl.umap(adata,
-                   use_raw=False,          # gene expression
-                   color='test_leiden_n15_r1.00',
-                   wspace=0.3,
-                   #ncols=3,
-                   neighbors_key='neighbors_15',
-                   show=False,
-                   ax=ax)
-        ax.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), frameon=False)
-        plt.title('Immune Umap Resolution = 1.00 (Leiden)')
-        fig.savefig(fname="/home/nolanreardson/Bioinformatics_Env_Windows/Astrocytes_imune_Cells/Clustresults/Immune_umap_test_leiden_n15_r1.00.png",
-                    dpi=300,
-                    bbox_inches='tight')
-        plt.close(fig)
-
-        #fig = plt.figure(figsize=(7, 7), dpi=300)
-        fig, ax = plt.subplots(figsize=(7, 7))
-
-        sc.pl.umap(adata,
-                   use_raw=False,          # gene expression
-                   color='test_leiden_n15_r2.00',
-                   wspace=0.3,
-                   #ncols=3,
-                   neighbors_key='neighbors_15',
-                   show=False,
-                   ax=ax)
-        ax.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), frameon=False)
-        plt.title('Immune Umap Resolution = 2.00 (Leiden)')
-        fig.savefig(fname="/home/nolanreardson/Bioinformatics_Env_Windows/Astrocytes_imune_Cells/Clustresults/Immune_umap_test_leiden_n15_r2.00.png", dpi=300, bbox_inches='tight')
-        plt.close(fig)
-
-        #fig = plt.figure(figsize=(7, 7), dpi=300)
         fig, ax = plt.subplots(figsize=(7, 7))
         
         sc.pl.umap(adata,
@@ -187,8 +126,8 @@ def start() -> None:
                    show=False,
                    ax=ax)
         ax.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), frameon=False)
-        plt.title('Immune Umap Fusion Cluster (Leiden)')
-        fig.savefig(fname="/home/nolanreardson/Bioinformatics_Env_Windows/Astrocytes_imune_Cells/Clustresults/Immune_umap_leiden_fusion.png", dpi=300, bbox_inches='tight')
+        plt.title(f'{d} Umap Fusion Cluster (Leiden)')
+        fig.savefig(fname=f"{H5AD_DIR}/Clustresults/{d}_umap_leiden_fusion.png", dpi=300, bbox_inches='tight')
         plt.close(fig)
 
         
