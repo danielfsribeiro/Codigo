@@ -1,36 +1,7 @@
 import os
-import gc
 import scanpy as sc
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-
-### Defines
-#Good_clusters_r2 = ['1', '10', '15', '24', '30']      # .obs['test_leiden_n15_r2']
-#Good_clusters_r1 = ["6", "7", "9"]
-#Bad_clusters_r1 = ["0", "1", "2", "3", "4,", "5", "8"]
-
-
-# Convert old cluter nr into new cluster nr
-dict_good_cells = {
-    '1': '2.1',
-    '10': '2.10',
-    "15": "2.15",
-    "24": "2.24",
-    "30": "2.30"
-}
-dict_bad_cells = {
-    '0': '1.0',
-    '1': '1.1',
-    '2': '1.2',
-    '3': '1.3',
-    '4': '1.4',
-    '5': '1.5',
-    '8': '1.8',
-}
-
-### Load data
-# Use adata_cca_features.h5ad --> must contain info about r1 and r2
 
 # New code to refactor
 small_names = {
@@ -41,10 +12,11 @@ small_names = {
 
 def start() -> None:
     # Import working directories
-    from globals import H5AD_DIR, CLUSTER_FUSION_DIR
+    from globals import H5AD_DIR, CLUSTER_FUSION_DIR, Clustresults
     from globals import DATASETS
+    from helper_functions import random_colors
     
-    for d in DATASETS:   
+    for d in DATASETS:
         # The code iterates over datasets stored in the datasets_divided list
         # Load cluster fusion file. The first columns contain higher resolution culsters
         # The fusion will be done from bottom to top of the cluster tree.
@@ -72,18 +44,15 @@ def start() -> None:
         else:
             continue
 
-
-        #TODO
-        
         clustered_cells = []                 # Save cells that were already annotated in a higher resolution
         print(adata)
         for res in cluster_df.columns:
             key = f'test_leiden_n15_{res}'      # recupera a resolução que precisamos olhar
             categories = [str(s) for s in cluster_df.loc[:, res].cat.categories.to_list()]
-            print(f"Clusters to include res={key}: {' '.join(categories)}")     #Debug
+            print(f"Clusters to include res={key}: {' '.join(categories)}")     # Debug
             # Which cells belonging to selected clusters
             temp = adata.obs.loc[:, key].copy()       # Para cada celula a qual cluster pertence na resolução leidein_rxx
-            mask = temp.isin(cluster_df.loc[:, res])    # Dentro da resolução, quais pertencem aos clusters da coluna em analise em cluster_df 
+            mask = temp.isin(cluster_df.loc[:, res])    # Dentro da resolução, quais pertencem aos clusters da coluna em analise em cluster_df
             temp = adata[mask].copy()                 # Just to be safe
             # Remove cells from the already clustered list
             mask2 = temp.obs_names.isin(clustered_cells)    # Ver se as células já foram clustered before
@@ -92,12 +61,12 @@ def start() -> None:
             clustered_cells.extend(temp.obs_names)  # Add new cells to list of already clustered cells
             # Update AnnData
             adata.obs.loc[temp.obs_names, 'leiden_fusion'] = [f"{small_names[d]}.{str(res[1:])}.{c}" for c in temp.obs.loc[:, key].to_list()]
-            
         
         #TODO
         # Cells not clustered - label them as cluster 'NA'
         unclustered_cells = adata[~adata.obs_names.isin(clustered_cells)].obs_names.to_list()
         print(f"Number of cells not selected: {len(unclustered_cells)}")
+        print(adata[~adata.obs_names.isin(clustered_cells)].obs.loc[:, ['test_leiden_n15_r2.0', 'test_leiden_n15_r1.0']])
         # Update AnnData
         adata.obs.loc[unclustered_cells, 'leiden_fusion'] = f"{small_names[d]}.NA"
         adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].astype(dtype='category')
@@ -114,66 +83,23 @@ def start() -> None:
         adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].astype(dtype='category')
         adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].cat.remove_unused_categories()
         
-        # UMAP 
+        # UMAP
         fig, ax = plt.subplots(figsize=(7, 7))
         
+        colors = random_colors(len(adata.obs['leiden_fusion'].cat.categories.to_list()))
         sc.pl.umap(adata,
                    use_raw=False,          # gene expression
                    color='leiden_fusion',
                    wspace=0.3,
                    #ncols=3,
+                   palette=colors,
                    neighbors_key='neighbors_15',
                    show=False,
                    ax=ax)
         ax.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), frameon=False)
         plt.title(f'{d} Umap Fusion Cluster (Leiden)')
-        fig.savefig(fname=f"{H5AD_DIR}/Clustresults/{d}_umap_leiden_fusion.png", dpi=300, bbox_inches='tight')
+        fig.savefig(fname=f"{Clustresults}/{d}_umap_leiden_fusion.png", dpi=300, bbox_inches='tight')
         plt.close(fig)
 
-        
-        #group_1 = adata.obs["Fusion_cluster"].str.startswith("1.")
-        #group_2 = adata.obs["Fusion_cluster"].str.startswith("2.")
-        
-        # Perform UMAP for each group separately
-        #sc.pp.neighbors(group_1)
-        #sc.tl.umap(group_1)
 
-        #sc.pp.neighbors(group_2)
-        #sc.tl.umap(group_2)
-        
-        # Plot UMAPs for both groups
-        #sc.pl.umap(group_1)
-        #sc.pl.umap(group_2)
- 
- ## Convert fusion cluster to categories: 
- 
- ### How to convert to categories:
-# data[d].obs[f'{es}_rank'] = None
-# code... code ...
-#   data[d].obs.loc[top_cells, f'{es}_rank'] = 'top'
-#   data[d].obs.loc[low_cells, f'{es}_rank'] = 'low'
-# 
-# When column is finished: 
-# data[d].obs[f'{es}_rank'] = data[d].obs[f'{es}_rank'].astype(dtype='category')
-#adata.obs['fusion_cluster'] = adata.obs['fusion_cluster'].astype("category")
-      
-start()     
-        
-        # ....
-        
-        # Delete other clusters (manter apenas "Fusion cluster", eliminar "...leiden_n15..." das secções .obs e .uns )
-        # Salvar como ... outro nome --> sc.write_h5ad(adata, output_filename) print(f"Altered data saved to {output_filename}")
-        
-        
-
-# ...
-# TODO 3: print of categories names
-#print(small_adata.obs['fusion_cluster'].cat.categories)
-
-### Output
-# Fazer um output de umaps da resolução test_leiden_r1 , r2, r1_2 (fusion of r1 and r2) 
-#print(small_adata.obs['test_leiden_n15_r1'].cat.categories) 
-
-
-          
-
+start()

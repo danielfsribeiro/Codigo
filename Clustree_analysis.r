@@ -20,6 +20,7 @@ cell_suffix = '0k'
 
 # Directories
 input_dir = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells" ##specifies the directory where input data files are located
+#input_dir = "Astrocytes_imune_Cells" ##specifies the directory where input data files are located
 output_dir = paste0(input_dir, "/Clustresults") ##specifies directory where output files will be saved
 
 # Dataset to analyze
@@ -38,9 +39,9 @@ fig_size[['Astrocyte']] = c(15, 10)
 for (d in datasets_divided) ##loop to run clustree for each dataset specified in datasets_divided
 {
   filename_in = paste0(input_dir, "/adata_final_", d, "_cca_features.rds")
-  print(filename_in) ##for each dataset, constructs input file path
-  adata.seurat = readRDS(filename_in) ##reads the input data and stores it in the variable adata.seurat
-  if (!is.null(node_colour))##runs clustree with different options based on node_colour variable
+  print(filename_in)   ##for each dataset, constructs input file path
+  adata.seurat = readRDS(filename_in)   ##reads the input data and stores it in the variable adata.seurat
+  if (!is.null(node_colour))    ##runs clustree with different options based on node_colour variable
     {
       f_path = paste0(output_dir, "/clustree_plot_", "adata_final_", d, layout, "_", node_colour, ".pdf")
       result = clustree(adata.seurat,

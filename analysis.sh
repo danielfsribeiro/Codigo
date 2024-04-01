@@ -1,9 +1,12 @@
 #!/bin/bash
+# This script organizes the multiple analysis files
+
 conda activate py39
 
 H5AD_DIR="/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
+#H5AD_DIR="Astrocytes_imune_Cells"
 
-## Exececute a file at a time
+
 ## Creates cluslters at multiple resolutions
 #FILE="Leiden script.py"
 #python "$FILE"
