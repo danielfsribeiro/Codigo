@@ -22,7 +22,7 @@ H5AD_DIR="/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
 #  return 1
 #fi
 
-## Plot UMAPs
+# Plot UMAPs
 #FILE="Astrocytes_GoodResolution.py"
 #python "$FILE"
 #if [[ $? -eq 0 ]]
@@ -36,7 +36,7 @@ H5AD_DIR="/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
 #  echo " "
 #  return 1
 #fi
-#
+
 #FILE="Immune_GoodResolution.py"
 #python "$FILE"
 #if [[ $? -eq 0 ]]
@@ -51,7 +51,7 @@ H5AD_DIR="/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
 #  return 1
 #fi
 
-## Convert .h5ad into rds
+# Convert .h5ad into rds
 #. h5ad_to_rds.sh ${H5AD_DIR}/adata_final_Astrocyte_cca_features.h5ad ${H5AD_DIR}/adata_final_Astrocyte_cca_features.rds
 #. h5ad_to_rds.sh ${H5AD_DIR}/adata_final_Immune_cca_features.h5ad ${H5AD_DIR}/adata_final_Immune_cca_features.rds
 #FILE="Clustree_analysis.r"
