@@ -62,7 +62,7 @@ def start() -> None:
             # Update AnnData
             adata.obs.loc[temp.obs_names, 'leiden_fusion'] = [f"{small_names[d]}.{str(res[1:])}.{c}" for c in temp.obs.loc[:, key].to_list()]
         
-        #TODO
+        
         # Cells not clustered - label them as cluster 'NA'
         unclustered_cells = adata[~adata.obs_names.isin(clustered_cells)].obs_names.to_list()
         print(f"Number of cells not selected: {len(unclustered_cells)}")
@@ -100,6 +100,13 @@ def start() -> None:
         plt.title(f'{d} Umap Fusion Cluster (Leiden)')
         fig.savefig(fname=f"{Clustresults}/{d}_umap_leiden_fusion.png", dpi=300, bbox_inches='tight')
         plt.close(fig)
+
+
+    # Save cca_features.h5ad
+    # Save data - TODO
+    dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
+    print(dest)
+    adata.write_h5ad(dest, compression='gzip')
 
 
 start()

@@ -13,7 +13,7 @@ small_names = {
 
 def start() -> None:
     # Import working directories
-    from globals import H5AD_DIR, CLUSTER_FUSION_DIR, Clustresults, IMMUNE_MARKERS_CSV
+    from globals import H5AD_DIR, CLUSTER_FUSION_DIR, Clustresults
     from globals import DATASETS, lineage_resolution_tests, ENV
     from helper_functions import random_colors
     
@@ -23,20 +23,6 @@ def start() -> None:
         # The fusion will be done from bottom to top of the cluster tree.
         # Thus, if a cell is to belong to a cluster from a high res, it will not be part of a cluster form a lower res.
         
-        # TODO: Adapt to import . tsv of known biomarkers
-        dest = f"{ENV}/{d}_Markers.csv"
-        if os.path.exists(dest):
-            print("Load cluster fusion file...")
-            print(dest)
-            cluster_df = pd.read_csv(dest,
-                                     sep='\t',
-                                     header=0,
-                                     dtype='category',
-                                     index_col=None,
-                                     na_filter=False)
-            print(cluster_df)
-        else:
-            continue
         
         # STEPS TODO
         # 1. Load feature data (clusters). Only contains HVG genes (4000 genes).
@@ -57,44 +43,62 @@ def start() -> None:
         else:
             continue
         
+    
         # 2
         # TODO
         # Load 'raw_norm_annot.h5ad'
+        adata_raw = sc.read_h5ad(f"{H5AD_DIR}/adata_final_{d}_raw_norm_annot.h5ad")
+        print(adata_raw)
         
-        for u in DATASETS:
-            data = sc.read_h5ad(f"adata_final_{u}_raw_norm_annot.h5ad")
-            print(data)
-            
 
         # 3
         # Refator code
         # Transfer over the metadata
-        data['raw_norm_annot'].obsm['X_umap'] = adata.obsm['X_umap'].copy()
-        data['adata_raw_norm'].obsm['X_tsne'] = adata.obsm['X_tsne'].copy()
+        adata_raw.obsm['X_umap'] = adata.obsm['X_umap'].copy()
+        adata_raw.obsm['X_tsne'] = adata.obsm['X_tsne'].copy()
         
         resolution = lineage_resolution_tests[d]
         i = '15'
-        for r in resolution:
-            if f'X_umap_neighbors_n{i}' in data[d].obsm.keys():
-                data['adata_raw_norm'].obsm[f'X_umap_neighbors_n{i}'] = data[d].obsm[f'X_umap_neighbors_n{i}'].copy()
-            if f'test_leiden_n{i}_r{r}' in data[d].obs.keys():
-                data['adata_raw_norm'].obs[f'test_leiden_n{i}_r{r}'] = data[d].obs[f'test_leiden_n{i}_r{r}'].copy()
-            if f'dendrogram_leiden_n{i}_r{r}' in data[d].uns.keys():
-                data['adata_raw_norm'].uns[f'dendrogram_leiden_n{i}_r{r}'] = data[d].uns[f'dendrogram_leiden_n{i}_r{r}'].copy()
+        if f'X_umap_neighbors_n{i}' in adata.obsm.keys():
+             adata_raw.obsm[f'X_umap_neighbors_n{i}'] = adata.obsm[f'X_umap_neighbors_n{i}'].copy()
+
+        if f"neighbors_{i}" in adata.obs.keys():
+            adata_raw.obs[f'neighbors_{i}'] = adata.obs[f'X_umap_neighbors_n{i}'].copy()
+
+
         
-        if 'leiden_fusion' in data[d].obs.keys():
-            data['adata_raw_norm'].obs['leiden_fusion'] = data[d].obs['leiden_fusion'].copy()
-        if 'dendrogram_leiden_fusion' in data[d].uns.keys():
-            data['adata_raw_norm'].uns['dendrogram_leiden_fusion'] = data[d].uns['dendrogram_leiden_fusion'].copy()
+        for r in resolution:
+            
+            #for item in data[d].obs.keys():
+            #    'leiden' in item:
+            #        # DO copy
+
+            if f'test_leiden_n{i}_r{r}' in adata.obs.keys():
+                adata_raw.obs[f'test_leiden_n{i}_r{r}'] = adata.obs[f'test_leiden_n{i}_r{r}'].copy()
+            
+            if f'leiden_n{i}_r{r}' in adata.obs.keys():
+                adata_raw.obs[f'leiden_n{i}_r{r}'] = adata.obs[f'leiden_n{i}_r{r}'].copy()
+
+            if f'dendrogram_leiden_n{i}_r{r}' in adata.uns.keys():
+                adata_raw.uns[f'dendrogram_leiden_n{i}_r{r}'] = adata.uns[f'dendrogram_leiden_n{i}_r{r}'].copy()
+        
+        #if 'leiden_fusion' in adata_raw.obs.keys():
+        #    adata_raw.obs['leiden_fusion'] = adata_raw.obs['leiden_fusion'].copy()
+
+        #if 'dendrogram_leiden_fusion' in adata_raw.uns.keys():
+        #    adata_raw['adata_raw_norm'].uns['dendrogram_leiden_fusion'] = adata_raw.uns['dendrogram_leiden_fusion'].copy()
 
         # Free some memory
         gc.collect()
         
         # 4
+        #log transformation of the data
+        sc.pp.log1p(adata_raw)
+
         # Find marker genes
         print("Find marker genes ...")
         # Marker genes for cluster fusions
-        sc.tl.rank_genes_groups(adata=data['adata_raw_norm'],
+        sc.tl.rank_genes_groups(adata=adata_raw,
                                 n_genes=None,
                                 groupby='leiden_fusion',
                                 method='wilcoxon',
@@ -108,9 +112,7 @@ def start() -> None:
         # Save data
         print("Save gene rank data...")
         dest = f"{H5AD_DIR}/adata_final_{d}_raw_norm_ranked.h5ad"
-        print(dest)
-        print(data['adata_raw_norm'])
-        data['adata_raw_norm'].write_h5ad(dest, compression='gzip')
+        adata_raw.write_h5ad(dest, compression='gzip')
 
        
 
