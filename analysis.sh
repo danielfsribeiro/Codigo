@@ -74,7 +74,7 @@ H5AD_DIR="/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
 # TODO
 # TODO: Harmonize file name. Change file name to remove DR
 # TODO: make it general for all populations
-FILE="Cluster_fusion_DR.py"
+FILE="Cluster_fusion.py"
 python "$FILE"
 if [[ $? -eq 0 ]]
 then

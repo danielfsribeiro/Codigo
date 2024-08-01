@@ -4,6 +4,7 @@ H5AD_DIR = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
 CLUSTER_FUSION_DIR = "/mnt/c/Users/vasco/Env/cluster_fusion"
 DATASETS = ["Immune", "Astrocyte"]
 Clustresults = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells/Clustresults"
+ENV = "/mnt/c/Users/vasco/Env/Immune_Markers.csv"
 
 
 #H5AD_DIR = "Astrocytes_imune_Cells"
