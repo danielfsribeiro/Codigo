@@ -42,7 +42,6 @@ def start() -> None:
             
         else:
             continue
-        
     
         # 2
         # TODO
@@ -88,11 +87,11 @@ def start() -> None:
         ### Depois tens de copiar toda essa info para o ficherio 'raw', que é feito nessas linhas seguintes.
         ### Penso que depois já tudo funcione.
         
-        #if 'leiden_fusion' in adata_raw.obs.keys():
-        #    adata_raw.obs['leiden_fusion'] = adata_raw.obs['leiden_fusion'].copy()
+        if 'leiden_fusion' in adata_raw.obs.keys():
+            adata_raw.obs['leiden_fusion'] = adata.obs['leiden_fusion'].copy()
 
-        #if 'dendrogram_leiden_fusion' in adata_raw.uns.keys():
-        #    adata_raw['adata_raw_norm'].uns['dendrogram_leiden_fusion'] = adata_raw.uns['dendrogram_leiden_fusion'].copy()
+        if 'dendrogram_leiden_fusion' in adata_raw.uns.keys():
+            adata_raw['adata_raw_norm'].uns['dendrogram_leiden_fusion'] = adata.uns['dendrogram_leiden_fusion'].copy()
 
         # Free some memory
         gc.collect()

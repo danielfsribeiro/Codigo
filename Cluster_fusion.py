@@ -107,6 +107,7 @@ def start() -> None:
     dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
     print(dest)
     adata.write_h5ad(dest, compression='gzip')
+    print(adata)
 
 
 start()
