@@ -60,7 +60,7 @@ def start() -> None:
         resolution = lineage_resolution_tests[d]
         i = '15'
         if f'X_umap_neighbors_n{i}' in adata.obsm.keys():
-             adata_raw.obsm[f'X_umap_neighbors_n{i}'] = adata.obsm[f'X_umap_neighbors_n{i}'].copy()
+            adata_raw.obsm[f'X_umap_neighbors_n{i}'] = adata.obsm[f'X_umap_neighbors_n{i}'].copy()
 
         if f"neighbors_{i}" in adata.obs.keys():
             adata_raw.obs[f'neighbors_{i}'] = adata.obs[f'X_umap_neighbors_n{i}'].copy()
@@ -81,6 +81,12 @@ def start() -> None:
 
             if f'dendrogram_leiden_n{i}_r{r}' in adata.uns.keys():
                 adata_raw.uns[f'dendrogram_leiden_n{i}_r{r}'] = adata.uns[f'dendrogram_leiden_n{i}_r{r}'].copy()
+        
+        # TODO
+        ### Tens de remover o comentátio destas linhas seguintes, as linhas 91-95.
+        ### No ficheiro anterior "Cluster_fusion.py" adicionas .obs['leiden_fusion'] ao ficheiro 'features' nas linhas 83-84.
+        ### Depois tens de copiar toda essa info para o ficherio 'raw', que é feito nessas linhas seguintes.
+        ### Penso que depois já tudo funcione.
         
         #if 'leiden_fusion' in adata_raw.obs.keys():
         #    adata_raw.obs['leiden_fusion'] = adata_raw.obs['leiden_fusion'].copy()
