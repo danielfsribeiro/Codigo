@@ -3,9 +3,9 @@
 
 conda activate py39
 
-#H5AD_DIR="/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
-cd /home/daniel/Desktop/Lab/Students/VascoLucas/Codigo/
-H5AD_DIR="Astrocytes_imune_Cells"
+H5AD_DIR="/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
+#cd /home/daniel/Desktop/Lab/Students/VascoLucas/Codigo/
+#H5AD_DIR="Astrocytes_imune_Cells"
 
 
 ## Creates cluslters at multiple resolutions
