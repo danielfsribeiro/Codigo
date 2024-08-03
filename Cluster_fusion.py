@@ -32,9 +32,6 @@ def start() -> None:
                                      index_col=None,
                                      na_filter=False)
             print(cluster_df)
-        else:
-            continue
-        
         # Load batch correct data
         dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
         if os.path.exists(dest):    # checks if the batch-corrected data already exists
@@ -43,7 +40,38 @@ def start() -> None:
             adata = sc.read_h5ad(dest)
         else:
             continue
-
+        
+        # Astrocytes do not have cluster fusion, but need a leiden_fusion entry. Use r0.6
+        if d == "Astrocyte":
+            adata.obs['leiden_fusion'] = None
+            adata.obs['leiden_fusion'] = adata.obs['test_leiden_n15_r0.6'].copy()
+            adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].astype(dtype='category')
+            adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].cat.remove_unused_categories()
+            # UMAP
+            fig, ax = plt.subplots(figsize=(7, 7))
+            
+            colors = random_colors(len(adata.obs['leiden_fusion'].cat.categories.to_list()))
+            sc.pl.umap(adata,
+                       use_raw=False,          # gene expression
+                       color='leiden_fusion',
+                       wspace=0.3,
+                       #ncols=3,
+                       palette=colors,
+                       neighbors_key='neighbors_15',
+                       show=False,
+                       ax=ax)
+            ax.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), frameon=False)
+            plt.title(f'{d} Umap Fusion Cluster (Leiden)')
+            fig.savefig(fname=f"{Clustresults}/{d}_umap_leiden_fusion.png", dpi=300, bbox_inches='tight')
+            plt.close(fig)
+            # Save cca_features.h5ad
+            print("Save data...")
+            dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
+            print(dest)
+            adata.write_h5ad(dest, compression='gzip')
+            print(adata)
+            break
+        
         clustered_cells = []                 # Save cells that were already annotated in a higher resolution
         print(adata)
         for res in cluster_df.columns:
@@ -61,7 +89,6 @@ def start() -> None:
             clustered_cells.extend(temp.obs_names)  # Add new cells to list of already clustered cells
             # Update AnnData
             adata.obs.loc[temp.obs_names, 'leiden_fusion'] = [f"{small_names[d]}.{str(res[1:])}.{c}" for c in temp.obs.loc[:, key].to_list()]
-        
         
         # Cells not clustered - label them as cluster 'NA'
         unclustered_cells = adata[~adata.obs_names.isin(clustered_cells)].obs_names.to_list()
@@ -101,12 +128,12 @@ def start() -> None:
         fig.savefig(fname=f"{Clustresults}/{d}_umap_leiden_fusion.png", dpi=300, bbox_inches='tight')
         plt.close(fig)
 
-
-    # Save cca_features.h5ad
-    # Save data - TODO
-    dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
-    print(dest)
-    adata.write_h5ad(dest, compression='gzip')
+        # Save cca_features.h5ad
+        print("Save data...")
+        dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
+        print(dest)
+        adata.write_h5ad(dest, compression='gzip')
+        print(adata)
 
 
 start()

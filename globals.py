@@ -1,16 +1,17 @@
 # Global definitions imported by multiple analysis files
 
-H5AD_DIR = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
-CLUSTER_FUSION_DIR = "/mnt/c/Users/vasco/Env/cluster_fusion"
-DATASETS = ["Immune", "Astrocyte"]
-Clustresults = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells/Clustresults"
-ENV = "/mnt/c/Users/vasco/Env"
-
-
-#H5AD_DIR = "Astrocytes_imune_Cells"
-#CLUSTER_FUSION_DIR = "cluster_fusion"
+#H5AD_DIR = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
+#CLUSTER_FUSION_DIR = "/mnt/c/Users/vasco/Env/cluster_fusion"
 #DATASETS = ["Immune", "Astrocyte"]
-#Clustresults = "Astrocytes_imune_Cells/Clustresults"
+#Clustresults = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells/Clustresults"
+#ENV = "/mnt/c/Users/vasco/Env"
+
+
+H5AD_DIR = "Astrocytes_imune_Cells"
+CLUSTER_FUSION_DIR = "cluster_fusion"
+DATASETS = ["Immune", "Astrocyte"]
+Clustresults = "Astrocytes_imune_Cells/Clustresults"
+ENV = "./"
 
 # Lineage resolution tests for clustree
 lineage_resolution_tests = {
