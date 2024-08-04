@@ -34,7 +34,7 @@ def start() -> None:
         # Load batch correct data
         dest = f"{H5AD_DIR}/adata_final_{d}_cca_features.h5ad"
         if os.path.exists(dest):    # checks if the batch-corrected data already exists
-            print("Load batch corrected data...")
+            print("Load feature data...")
             print(dest)
             adata = sc.read_h5ad(dest)
             
@@ -42,17 +42,21 @@ def start() -> None:
             
         else:
             continue
+        
     
         # 2
         # TODO
         # Load 'raw_norm_annot.h5ad'
+        print("Load raw data...")
         adata_raw = sc.read_h5ad(f"{H5AD_DIR}/adata_final_{d}_raw_norm_annot.h5ad")
+        adata_raw.uns['log1p']['base'] = None
         print(adata_raw)
         
 
         # 3
         # Refator code
         # Transfer over the metadata
+        print("Transfer metadata...")
         adata_raw.obsm['X_umap'] = adata.obsm['X_umap'].copy()
         adata_raw.obsm['X_tsne'] = adata.obsm['X_tsne'].copy()
         
@@ -64,8 +68,6 @@ def start() -> None:
         if f"neighbors_{i}" in adata.obs.keys():
             adata_raw.obs[f'neighbors_{i}'] = adata.obs[f'X_umap_neighbors_n{i}'].copy()
 
-
-        
         for r in resolution:
             
             #for item in data[d].obs.keys():
@@ -81,16 +83,10 @@ def start() -> None:
             if f'dendrogram_leiden_n{i}_r{r}' in adata.uns.keys():
                 adata_raw.uns[f'dendrogram_leiden_n{i}_r{r}'] = adata.uns[f'dendrogram_leiden_n{i}_r{r}'].copy()
         
-        # TODO
-        ### Tens de remover o comentátio destas linhas seguintes, as linhas 91-95.
-        ### No ficheiro anterior "Cluster_fusion.py" adicionas .obs['leiden_fusion'] ao ficheiro 'features' nas linhas 83-84.
-        ### Depois tens de copiar toda essa info para o ficherio 'raw', que é feito nessas linhas seguintes.
-        ### Penso que depois já tudo funcione.
-        
-        if 'leiden_fusion' in adata_raw.obs.keys():
+        if 'leiden_fusion' in adata.obs.keys():
             adata_raw.obs['leiden_fusion'] = adata.obs['leiden_fusion'].copy()
 
-        if 'dendrogram_leiden_fusion' in adata_raw.uns.keys():
+        if 'dendrogram_leiden_fusion' in adata.uns.keys():
             adata_raw['adata_raw_norm'].uns['dendrogram_leiden_fusion'] = adata.uns['dendrogram_leiden_fusion'].copy()
 
         # Free some memory
@@ -98,7 +94,8 @@ def start() -> None:
         
         # 4
         #log transformation of the data
-        sc.pp.log1p(adata_raw)
+        if "log1p" not in adata_raw.uns_keys():
+            sc.pp.log1p(adata_raw)
 
         # Find marker genes
         print("Find marker genes ...")
