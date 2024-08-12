@@ -11,6 +11,7 @@ ENV = "/mnt/c/Users/vasco/Env"
 #CLUSTER_FUSION_DIR = "cluster_fusion"
 #DATASETS = ["Immune", "Astrocyte"]
 #Clustresults = "Astrocytes_imune_Cells/Clustresults"
+#ENV = "./"
 
 # Lineage resolution tests for clustree
 lineage_resolution_tests = {

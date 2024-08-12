@@ -4,6 +4,7 @@
 conda activate py39
 
 H5AD_DIR="/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells"
+#cd /home/daniel/Desktop/Lab/Students/VascoLucas/Codigo/
 #H5AD_DIR="Astrocytes_imune_Cells"
 
 
@@ -88,6 +89,19 @@ else
   return 1
 fi
 
+FILE="Calculate_markers.py"
+python "$FILE"
+if [[ $? -eq 0 ]]
+then
+  echo "Success '$FILE'"
+  echo "Script ran successfuly."
+  echo " "
+else
+  echo "Error '$FILE'"
+  echo "Script did not complete. Exit all analysis."
+  echo " "
+  return 1
+fi
 
 
 # TODO
