@@ -45,7 +45,12 @@ def start() -> None:
         if d == "Astrocyte":
             adata.obs['leiden_fusion'] = None
             adata.obs['leiden_fusion'] = adata.obs['test_leiden_n15_r0.6'].copy()
+            # Rename categries
+            adata.obs.loc[:, 'leiden_fusion'] = [f"{small_names[d]}.0.6.{c}" for c in adata.obs.loc[:, 'leiden_fusion'].to_list()]
+            
             adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].astype(dtype='category')
+            
+
             adata.obs['leiden_fusion'] = adata.obs['leiden_fusion'].cat.remove_unused_categories()
             # UMAP
             fig, ax = plt.subplots(figsize=(7, 7))
