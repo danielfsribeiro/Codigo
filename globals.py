@@ -7,11 +7,11 @@ Clustresults = "/mnt/c/Users/vasco/Env/Astrocytes_imune_Cells/Clustresults"
 ENV = "/mnt/c/Users/vasco/Env"
 
 
-#H5AD_DIR = "Astrocytes_imune_Cells"
-#CLUSTER_FUSION_DIR = "cluster_fusion"
-#DATASETS = ["Immune", "Astrocyte"]
-#Clustresults = "Astrocytes_imune_Cells/Clustresults"
-#ENV = "./"
+H5AD_DIR = "Astrocytes_imune_Cells"
+CLUSTER_FUSION_DIR = "cluster_fusion"
+DATASETS = ["Immune", "Astrocyte"]
+Clustresults = "Astrocytes_imune_Cells/Clustresults"
+ENV = "./Env"
 
 # Lineage resolution tests for clustree
 lineage_resolution_tests = {
