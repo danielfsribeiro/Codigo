@@ -17,3 +17,13 @@ ENV = "./Env"
 lineage_resolution_tests = {
     'Astrocyte': [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 1, 2],
     'Immune': [0.1, 0.2, 0.3, 0.4, 0.5, 1, 1.1, 1.2, 2]}
+
+
+# GSEA vars
+# Gene sets for GSEApy. name are taken from https://maayanlab.cloud/Enrichr/#libraries
+gene_sets = {
+    "H:hallmark": ["MSigDB_Hallmark_2020"],
+    "C2:curarted": ["KEGG_2016"],
+    #"C5:ontology": ["GO_Biological_Process_2021"],
+    #"C5:ontology": ["GO_Biological_Process_2021", "GO_Cellular_Component_2021", "GO_Molecular_Function_2021"],
+}
