@@ -11,8 +11,8 @@ import gc
 
 import pandas as pd
 import scanpy as sc
-import matplotlib
-matplotlib.use('cairo')
+
+
 
 
 def prerank_gsea(kwargs: dict) -> None:
@@ -21,20 +21,18 @@ def prerank_gsea(kwargs: dict) -> None:
     
     seed = 2015854237
     d = kwargs['dataset']
-
-    neigh = kwargs['neighbor']
-    res = kwargs['resolution']
     c = kwargs['cluster']
     
-    print(f"Calculate for {d} leiden_n{neigh}_r{res}_c{c}")
-    kwargs['scores_df'].sort_values(by=f'{c}.scores', ascending=False, inplace=True)
-    kwargs['scores_df'].set_index(f'{c}.names', verify_integrity=True, inplace=True)
+    print(f"Calculate for {d} {c}")
+    kwargs['scores_df'].sort_values(by='scores', ascending=False, inplace=True)
+    kwargs['scores_df'].set_index('names', verify_integrity=True, inplace=True)
                 
     # Build prerank df
+    # Substitute mouse gene names by human gene names
     prerank_df = pd.DataFrame()
     prerank_df['gene'] = kwargs['converted_genes_df'].loc[kwargs['scores_df'].index[kwargs['scores_df'].index.isin(kwargs['converted_genes_df'].index)]]
     prerank_df.drop_duplicates(subset='gene', inplace=True)
-    prerank_df['score'] = kwargs['scores_df'].loc[prerank_df.index, f'{c}.scores']
+    prerank_df['score'] = kwargs['scores_df'].loc[prerank_df.index, 'scores']
     prerank_df.set_index('gene', verify_integrity=True, inplace=True)
     
     # Prerank GSEA
@@ -43,8 +41,8 @@ def prerank_gsea(kwargs: dict) -> None:
     # Run GSEA per gene set
     for k, v in gene_sets.items():
         for gs in v:
-            print(f"Analyzing {d} leiden_n{neigh}_r{res}_c{c} {k} - {gs}...")
-            dest = kwargs['gsea_dir'] + k.replace(':', '_') + f"/{d}_leiden_n{neigh}_r{res}_c{c}_{gs}"
+            print(f"Analyzing {d} {c} {k} - {gs}...")
+            dest = kwargs['gsea_dir'] + k.replace(':', '_') + f"/{d}_{c}_{gs}"
             pre_res = gp.prerank(rnk=prerank_df,
                                  gene_sets=gs,
                                  threads=kwargs['threads'],
@@ -63,38 +61,28 @@ def prerank_gsea(kwargs: dict) -> None:
 
 def gsea_wilcoxon(dataset: str,
                   selected_genes: pd.DataFrame,
-                  neighbor: int,
-                  resolution: float,
-                  n_hvg: int,
-                  ranked_genes_dir: str,
+                  h5adadata: sc.AnnData,
+                  groupby: str,     # key in .obs
+                  unskey : str,     # key in .uns
                   gsea_dir: str,
                   n_proc: int) -> None:
-    dest = f"{ranked_genes_dir}/{dataset}_final_marker_genes_leiden_n{neighbor}_r{resolution}_{n_hvg}.txt"
-    print("Load marker gene data...")
-    print(dest)
-    df_marker = pd.read_csv(dest, sep='\t', index_col=0, header=0)
     
-    # Find clusters
-    clusters = list(set([s.split('.')[0] for s in df_marker.columns.to_list()]))
-    clusters.sort(key=lambda x: int(x))
-    
-    # Run GSEA for each cluster
-    print("Run pre-ranked GSEA...")
-    n_tasks = len(clusters)
-    print(f"Tasks to execute: {n_tasks}")
-    if n_proc is None:
-        n_proc = 4
+    clusters = h5adadata.obs[groupby].cat.categories.to_list()
     for c in clusters:
-        args = {'scores_df': df_marker.loc[:, [f'{c}.names',
-                                               f'{c}.scores',
-                                               f'{c}.logfoldchanges',
-                                               f'{c}.pvals',
-                                               f'{c}.pvals_adj',
-                                               f'{c}.pts']].copy(),
+        getrankgenes = sc.get.rank_genes_groups_df(adata=h5adadata,
+                                                    group=c,
+                                                    key= unskey)
+        print(c, ':')
+        print(getrankgenes)
+        print()
+
+        # Run GSEA for each cluster
+        print("Run pre-ranked GSEA...")
+        if n_proc is None:
+            n_proc = os.cpu_count() - 1
+        args = {'scores_df': getrankgenes.loc[:, ["names", "scores"]].copy(),
                 'converted_genes_df': selected_genes,
                 'dataset': dataset,
-                'neighbor': neighbor,
-                'resolution': resolution,
                 'cluster': c,
                 'gsea_dir': f'{gsea_dir}/wilcoxon_',
                 'threads': n_proc,
@@ -109,26 +97,29 @@ def start(n_proc=None) -> None:
     import mygene
     import time
     import datetime
-    import src.globals   # noqa:F401
-    from src.globals import checkpoint_dir, annotation_dir, marker_genes_dir, gsea_dir
-    from src.globals import data, datasets_divided, lineage_resolution_final, n_neighbors_final, n_hvg_spi
+   
+    from globals import H5AD_DIR, GSEA_DIR
+    from globals import DATASETS
     
-    neigh = n_neighbors_final[0]
+    
     # Load socres
     t1 = time.time()
-    for d in datasets_divided:
-        dest = f"{checkpoint_dir}/adata_final_{d}_raw_norm_ranked.h5ad"
-        if os.path.exists(dest):
-            print("Load gene rank data...")
+    for d in DATASETS:
+        dest = f"{H5AD_DIR}/adata_final_{d}_raw_norm_ranked.h5ad"
+        if os.path.exists(dest):    # checks if the batch-corrected data already exists
+            print("Load feature data...")
             print(dest)
-            data[d] = sc.read_h5ad(dest)
+            adata = sc.read_h5ad(dest)
+            
+            print(adata)
+            
         else:
             continue
         
         # Convert mouse genes to humam
         t2 = time.time()
         mg = mygene.MyGeneInfo()
-        converted = mg.querymany(data[d].var_names, scopes='symbol,alias', species='human', fields='ensembl.gene,symbol', as_dataframe=True)
+        converted = mg.querymany(adata.var_names, scopes='symbol,alias', species='human', fields='ensembl.gene,symbol', as_dataframe=True)
         converted.dropna(axis=0, subset='symbol', inplace=True)
         converted = converted['symbol']
         
@@ -136,11 +127,10 @@ def start(n_proc=None) -> None:
         print("Calculate GSEA for ranked genes (wilcoxon scores)...")
         gsea_wilcoxon(dataset=d,
                       selected_genes=converted,
-                      neighbor=neigh,
-                      resolution=lineage_resolution_final[d][0],
-                      n_hvg=n_hvg_spi,
-                      ranked_genes_dir=marker_genes_dir,
-                      gsea_dir=gsea_dir,
+                      unskey= "rank_genes_groups_leiden_fusion",
+                      h5adadata = adata,
+                      groupby= "leiden_fusion",
+                      gsea_dir=GSEA_DIR,
                       n_proc=n_proc)
         
         print(f"Time for {d}: {datetime.timedelta(seconds=(time.time()-t2))}")
