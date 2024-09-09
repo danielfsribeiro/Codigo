@@ -12,6 +12,7 @@ GSEA_DIR = "/mnt/c/Users/vasco/Env/GSEA_DIR"
 #DATASETS = ["Immune", "Astrocyte"]
 #Clustresults = "Astrocytes_imune_Cells/Clustresults"
 #ENV = "./Env"
+#GSEA_DIR = "./Env/GSEA_DIR"
 
 
 # Lineage resolution tests for clustree

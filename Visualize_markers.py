@@ -15,10 +15,12 @@ def start() -> None:
     from globals import H5AD_DIR, Clustresults
     from globals import DATASETS, ENV
     #from helper_functions import random_colors
-    print(plt.rcParams.keys)
-    plt.rcParams.update({'axes.labelsize': 50})
-    #plt.rcParams.update({'xtick.labelsize': 50})
-    #plt.rcParams.update({'ytick.labelsize': 50})
+    
+    
+    #print(plt.rcParams.keys)
+    #plt.rcParams.update({'axes.labelsize': 50})
+    ##plt.rcParams.update({'xtick.labelsize': 50})
+    ##plt.rcParams.update({'ytick.labelsize': 50})
 
 
     # STEPS TODO
@@ -148,6 +150,16 @@ def start() -> None:
                                               colorbar_title="log fold change",
                                               return_fig=True)
         
+        # All Axes used in dotplot
+        print("Dotplot axes:", fig)
+        # Select the Axes object that contains the subplot of interest
+        ax_dict = fig.get_axes()
+        print(ax_dict)
+        ax = ax_dict['mainplot_ax']
+        ax.tick_params(axis='y', labelsize=20)
+        ax.tick_params(axis='x', labelsize=16)
+        ax2 = ax_dict['gene_group_ax']
+        ax2.tick_params(labelrotation=90)
         plt.title(f'{d} Clusters Differential Gene Expression')
         #ax.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), frameon=False)
         fig.savefig(filename=f"{Clustresults}/{d}_denovo_dotplot.png", dpi=150, bbox_inches='tight')
@@ -187,7 +199,8 @@ def start() -> None:
                       standard_scale='var',
                       ax=ax,
                       )
-        
+        ax.tick_params(axis='y', labelsize=20)
+        ax.tick_params(axis='x', labelsize=16)
         ax.legend(loc='center left', bbox_to_anchor=(1.05, 0.5), frameon=False)
         plt.title(f'{d} Cluster Cell Type and Gene Expression')
         fig.savefig(fname=f"{Clustresults}/{fname}_Cell_Type_Gene_expression_dotplot.png", dpi=300, bbox_inches='tight')
