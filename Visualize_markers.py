@@ -15,7 +15,12 @@ def start() -> None:
     from globals import H5AD_DIR, Clustresults
     from globals import DATASETS, ENV
     #from helper_functions import random_colors
-    
+    print(plt.rcParams.keys)
+    plt.rcParams.update({'axes.labelsize': 50})
+    #plt.rcParams.update({'xtick.labelsize': 50})
+    #plt.rcParams.update({'ytick.labelsize': 50})
+
+
     # STEPS TODO
     # 1. Load literature marker files.
     
